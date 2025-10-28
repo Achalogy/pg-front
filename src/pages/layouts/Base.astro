@@ -1,0 +1,54 @@
+---
+//@ts-expect-error
+import LoadingIndicator from "astro-loading-indicator/component";
+import { ClientRouter } from "astro:transitions";
+import "../styles/global.css";
+
+const { title, desc } = Astro.props;
+const themeCookie = Astro.cookies.get("theme")?.value ?? "light";
+---
+
+<html lang="es" about="acha">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{title ?? "TCG-Acha"}</title>
+    <meta name="description" content={desc ?? ""} />
+    <link rel="icon" type="image/svg+xml" href="/favicon.ico?v=16" />
+    <meta name="viewport" content="width=device-width" />
+    <meta http-equiv="X-UA-Compatible" content="ie=edge" />
+    <meta name="generator" content={Astro.generator} />
+    <meta name="theme-color" content="#ffffff" />
+    <link rel="manifest" href="/site.webmanifest" />
+  </head>
+  <ClientRouter />
+  <LoadingIndicator
+    color="rgb(248, 133,133)"
+    height="0.25rem"
+    threshold={100}
+  />
+  <body>
+    <main class={themeCookie + " relative"}>
+      <div
+        class={`flex flex-col min-h-screen bg-white dark:bg-slate-900 dark:text-white`}
+      >
+        <script is:inline>
+          function changeTheme() {
+            const value = `; ${document.cookie}`;
+            const parts = value.split(`; theme=`);
+            const theme = parts.pop().split(";").shift();
+            const nTheme = theme == "dark" ? "light" : "dark";
+            document.cookie = `theme=${nTheme}; expires=${new Date(Date.now() + 10e9).toUTCString()}; path=/`;
+            window.location.reload();
+          }
+        </script>
+
+        <div class="h-[100dvh]">
+          <slot />
+        </div>
+      </div>
+    </main>
+  </body>
+
+
+</html>
