@@ -15,7 +15,7 @@ if (result && !result.error) {
   Astro.cookies.set("token", token, {
     expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
   });
-  return Astro.redirect("/");
+  return Astro.redirect("/app");
 }
 ---
 
