@@ -1,6 +1,7 @@
 import { LogInAction } from './auth/LogInAction';
 import { SignUpAction } from './auth/signUpAction';
 import { deleteGoalAction } from './goals/deleteGoalAction';
+import { markGoalAction } from './goals/markGoalAction';
 import { postGoalAction } from './goals/postGoalAction';
 import { deleteTransactionAction } from './transactions/deleteTransactionAction';
 import { postTransactionAction } from './transactions/postTransactionAction';
@@ -13,5 +14,6 @@ export const server = {
   "delete-transaction": deleteTransactionAction,
   "set-transaction-goal": setTransactionGoalAction,
   "post-goal": postGoalAction,
-  "delete-goal": deleteGoalAction
+  "delete-goal": deleteGoalAction,
+  "mark-goal": markGoalAction
 }

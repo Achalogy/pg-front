@@ -1,0 +1,30 @@
+---
+interface Props {
+  max: number;
+  curr: number;
+  done: boolean;
+}
+
+const { done, curr, max } = Astro.props;
+
+const percentaje = Math.max((curr * 100) / max, 5);
+---
+
+<div class="w-full h-5 rounded-full bg-neutral-200 p-0.5 flex items-center">
+  {
+    done ? (
+      <div class="w-full h-4 rounded-full bg-amber-300 flex items-center justify-center">
+        <p class="text-[0.6rem] text-white font-semibold">Completada!</p>
+      </div>
+    ) : (
+      <div
+        style={`width: ${percentaje}%`}
+        class="h-4 rounded-full flex items-center justify-center bg-indigo-300"
+      >
+        {percentaje > 24 && (
+          <p class="text-[0.6rem] text-white">{percentaje}%</p>
+        )}
+      </div>
+    )
+  }
+</div>

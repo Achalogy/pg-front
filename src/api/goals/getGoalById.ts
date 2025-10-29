@@ -8,6 +8,7 @@ export default async (Astro: any, id: string): Promise<{
   deadline: Date,
   completed: boolean,
   createdAt: Date
+  currentBalance: number
 }> => {
   const query = await fetch(new URL(`/goals/${id}`, BACKEND_URL), {
     headers: headersWAuth(Astro),

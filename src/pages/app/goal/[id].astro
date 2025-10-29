@@ -12,6 +12,7 @@ let goal: {
   deadline: Date;
   completed: boolean;
   createdAt: Date;
+  currentBalance: number;
 } | null = null;
 
 try {
@@ -26,6 +27,7 @@ try {
 
   document.addEventListener("astro:page-load", () => {
     const deleteButton = document.getElementById("delete-button");
+    const markButton = document.getElementById("mark-button");
 
     deleteButton?.addEventListener("click", async () => {
       const id = deleteButton.dataset.id!;
@@ -36,6 +38,21 @@ try {
 
       if (!req.error) window.location.href = "/app/goals";
       else alert("Hubo un error al intentar eliminar la meta");
+    });
+
+    markButton?.addEventListener("click", async () => {
+      const id = markButton.dataset.id!;
+      const v = (markButton.dataset.v! == "true");
+
+      console.log(v)
+
+      const req = await actions["mark-goal"]({
+        id,
+        v,
+      });
+
+      if (!req.error) window.location.reload()
+      else alert("Hubo un error al intentar marcar la meta");
     });
   });
 </script>
@@ -50,6 +67,14 @@ try {
       class="bg-red-400 text-white font-semibold px-3 p-2 rounded-md"
     >
       Eliminar
+    </button>
+    <button
+      id="mark-button"
+      data-id={goal.id}
+      data-v={!goal.completed}
+      class="bg-indigo-400 text-white font-semibold px-3 p-2 rounded-md"
+    >
+      Marcar como {goal.completed ? "No Completada" : "Completada"}
     </button>
   </div>
 </GoBackLayout>
