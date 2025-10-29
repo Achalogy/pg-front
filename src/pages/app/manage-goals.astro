@@ -10,7 +10,6 @@ const inputErrors = isInputError(result?.error) ? result.error.fields : {};
 const hasError = !!result?.error;
 const isInputErrorIndicator = hasError && isInputError(result?.error);
 
-console.log(result);
 
 try {
   headersWAuth(Astro);

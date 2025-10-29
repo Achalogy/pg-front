@@ -1,6 +1,12 @@
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
 import TransactionsSection from "../../sections/app/TransactionsSection.astro";
+import headersWAuth from "../../utils/headersWAuth";
+try {
+  headersWAuth(Astro);
+} catch {
+  return Astro.redirect("/log-in");
+}
 ---
 
 <AppLayout>

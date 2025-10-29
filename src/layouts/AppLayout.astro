@@ -10,12 +10,6 @@ import {
 } from "@tabler/icons-react";
 import headersWAuth from "../utils/headersWAuth";
 
-try {
-  headersWAuth(Astro);
-} catch {
-  return Astro.redirect("/log-in");
-}
-
 const route = new URL(Astro.request.url).pathname.split("/")?.at(-1);
 ---
 
