@@ -22,7 +22,7 @@ const percentaje = Math.max((curr * 100) / max, 5);
         class="h-4 rounded-full flex items-center justify-center bg-indigo-300"
       >
         {percentaje > 24 && (
-          <p class="text-[0.6rem] text-white">{percentaje}%</p>
+          <p class="text-[0.6rem] text-white">{percentaje.toFixed(1)}%</p>
         )}
       </div>
     )
