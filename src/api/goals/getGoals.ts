@@ -4,16 +4,11 @@ import headersWAuth from "../..//utils/headersWAuth";
 export default async (Astro: any): Promise<{
   data: {
     id: string;
-    type: "INCOME" | "EXPENSE";
-    amount: number;
-    category: string;
-    description: string;
-    date: Date;
-    createdAt: Date;
-    goalId?: string;
-    goal: {
-      name: string
-    }
+    name: string,
+    targetAmount: number,
+    deadline: Date,
+    completed: boolean,
+    createdAt: Date
   }[],
   meta: {
     hasNext: boolean,
@@ -22,7 +17,7 @@ export default async (Astro: any): Promise<{
     next: number
   }
 }> => {
-  const query = await fetch(new URL("/transactions", BACKEND_URL), {
+  const query = await fetch(new URL("/goals", BACKEND_URL), {
     headers: headersWAuth(Astro),
   });
 

@@ -1,0 +1,104 @@
+---
+import TransactionComponent from "../../../components/TransactionComponent.astro";
+import GoBackLayout from "../../../layouts/GoBackLayout.astro";
+import getTransactionById from "../../../api/transactions/getTransactionById";
+import getGoals from "../../../api/goals/getGoals";
+
+const { id } = Astro.params;
+
+let transaction: any | null = null;
+let goals: {
+  data: {
+    id: string;
+    name: string;
+    targetAmount: number;
+    deadline: Date;
+    completed: boolean;
+    createdAt: Date;
+  }[];
+  meta: {
+    hasNext: boolean;
+    totalCount: number;
+    count: number;
+    next: number;
+  };
+} | null = null;
+
+try {
+  transaction = await getTransactionById(Astro, id ?? "");
+  goals = await getGoals(Astro);
+} catch {
+  return Astro.redirect("/app");
+}
+---
+
+<script>
+  import { actions } from "astro:actions";
+
+  document.addEventListener("astro:page-load", () => {
+    const deleteButton = document.getElementById("delete-button");
+
+    deleteButton?.addEventListener("click", async () => {
+      const id = deleteButton.dataset.id!;
+
+      const req = await actions["delete-transaction"]({
+        id,
+      });
+
+      if (!req.error) window.location.href = "/app";
+      else alert("Hubo un error al intentar eliminar la meta");
+    });
+
+    const metaButtons = document.querySelectorAll(".meta-button");
+
+    metaButtons.forEach((m) => {
+      m.addEventListener("click", async () => {
+        //@ts-expect-error
+        const tid = m.dataset.tid!;
+        //@ts-expect-error
+        const gid = m.dataset.gid!;
+
+        const req = await actions["set-transaction-goal"]({
+          tid,
+          gid,
+        });
+
+        if (!req.error) window.location.reload();
+        else alert("Hubo un error al intentar cambiar la meta");
+      });
+    });
+  });
+</script>
+
+<GoBackLayout>
+  <div class="flex flex-col gap-2 p-4 w-full">
+    <TransactionComponent {...transaction} />
+
+    <b>Meta:</b>
+
+    {
+      goals &&
+        [
+          ...goals.data,
+          {
+            id: "remove",
+            name: "Ninguna",
+          },
+        ].map((g) => {
+          return (
+            <div class="meta-button bg-neutral-50 p-2 rounded-md cursor-pointer" data-gid={g.id} data-tid={transaction.id}>
+              Establecer meta a <span class="text-red-400">{g.name}</span>
+            </div>
+          );
+        })
+    }
+
+    <button
+      id="delete-button"
+      data-id={transaction.id}
+      class="bg-red-400 text-white font-semibold px-3 p-2 rounded-md"
+    >
+      Eliminar
+    </button>
+  </div>
+</GoBackLayout>

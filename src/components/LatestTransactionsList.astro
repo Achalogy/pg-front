@@ -5,13 +5,16 @@ import TransactionComponent from "./TransactionComponent.astro";
 let transactions: {
   data: {
     id: string;
-    userId: string;
     type: "INCOME" | "EXPENSE";
     amount: number;
     category: string;
     description: string;
     date: Date;
     createdAt: Date;
+    goalId?: string;
+    goal: {
+      name: string;
+    };
   }[];
   meta: {
     hasNext: boolean;

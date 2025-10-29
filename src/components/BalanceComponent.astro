@@ -4,9 +4,12 @@ import { IconArrowDown, IconArrowUp } from "@tabler/icons-react";
 import pattern from "../../assets/money_doodles.webp";
 
 let balance: null | {
-  balance: number;
-  income: number;
-  expense: number;
+  balanceTotal: number;
+  incomeTotal: number;
+  expenseTotal: number;
+  balanceDisponible: number;
+  incomeDisponible: number;
+  expenseDisponible: number;
 } = null;
 
 try {
@@ -25,20 +28,26 @@ try {
       <div class="relative z-10 flex flex-col gap-4 justify-between flex-1">
         <p class="text-3xl font-semibold">
           $
-          {balance.balance.toLocaleString("es-CO", {
+          {balance.balanceDisponible.toLocaleString("es-CO", {
+            minimumFractionDigits: 2,
+          })}
+        </p>
+        <p class="text-xs text-neutral-300">
+          Total: $
+          {balance.balanceTotal.toLocaleString("es-CO", {
             minimumFractionDigits: 2,
           })}
         </p>
         <div class="flex flex-col gap-2">
           <p class="text-green-200 flex gap-2 items-center">
             <IconArrowUp /> Ingresos: $
-            {balance.income.toLocaleString("es-CO", {
+            {balance.incomeDisponible.toLocaleString("es-CO", {
               minimumFractionDigits: 2,
             })}
           </p>
           <p class="text-red-200 flex gap-2 items-center">
             <IconArrowDown /> Gastos: $
-            {balance.expense.toLocaleString("es-CO", {
+            {balance.expenseDisponible.toLocaleString("es-CO", {
               minimumFractionDigits: 2,
             })}
           </p>

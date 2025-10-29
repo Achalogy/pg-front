@@ -2,9 +2,12 @@ const { BACKEND_URL } = import.meta.env;
 import headersWAuth from "../..//utils/headersWAuth";
 
 export default async (Astro: any): Promise<{
-  balance: number,
-  income: number,
-  expense: number
+  balanceTotal: number,
+  incomeTotal: number,
+  expenseTotal: number,
+  balanceDisponible: number,
+  incomeDisponible: number,
+  expenseDisponible: number,
 }> => {
 
   const query = await fetch(new URL("/user/balance", BACKEND_URL), {

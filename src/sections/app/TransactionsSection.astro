@@ -1,0 +1,23 @@
+---
+import { IconPlus } from "@tabler/icons-react";
+import LatestTransactionsList from "../../components/LatestTransactionsList.astro";
+---
+
+<div class="flex flex-col gap-6 p-4">
+  <div class="flex items-center justify-between text-[1.5rem]/[0.1rem]">
+    <h2>
+      <b>Transacciones</b>
+    </h2>
+    <a href="/app/manage-transactions" class="no-underline!">
+      <div
+        class="flex items-center justify-center h-8 rounded-full bg-white text-neutral-500 mt-2 text-xs gap-2 px-2 select-none"
+      >
+        <IconPlus />
+        <p class="mb-1">agregar</p>
+      </div></a
+    >
+  </div>
+  <div class="flex flex-col gap-4">
+    <LatestTransactionsList />
+  </div>
+</div>

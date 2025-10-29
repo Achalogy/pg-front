@@ -1,0 +1,15 @@
+---
+import BaseLayout from "./BaseLayout.astro";
+---
+
+<BaseLayout>
+  <a onclick="history.back()" class="no-underline! fixed top-0">
+    <div
+      class="bg-white z-10 backdrop-blur-2xl w-dvw h-12 flex justify-center items-center"
+    >
+      <b class="text-black text-center">Volver</b>
+    </div>
+  </a>
+  <div class="h-12"></div>
+  <slot />
+</BaseLayout>

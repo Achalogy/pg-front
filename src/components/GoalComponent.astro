@@ -1,0 +1,47 @@
+---
+
+interface Props {
+  id: string;
+  name: string;
+  targetAmount: number;
+  deadline: Date;
+  completed: boolean;
+  createdAt: Date;
+}
+
+const goal: Props = Astro.props;
+---
+
+<div class="flex flex-col rounded-xl bg-white p-3 px-4 gap-1">
+  <div class="flex justify-between items-center">
+    <div
+      class="flex items-center justify-center w-1/5 max-w-10 h-10 rounded-full bg-neutral-100"
+    >
+    </div>
+    <div class="w-2/5 text-xs">
+      <a
+        class="text-xs text-black! no-underline!"
+        href={`/app/goal/${goal.id}`}
+      >
+        <b>{goal.name}</b>
+      </a>
+    </div>
+    <div class="w-2/5 flex justify-end">
+      <b
+        >${
+          Number(goal.targetAmount).toLocaleString("es-CO", {
+            minimumFractionDigits: 2,
+          })
+        }</b
+      >
+    </div>
+  </div>
+  <div class="flex justify-between">
+    <p class="text-xs text-neutral-300 w-3/5 line-clamp-2">
+      <!-- {transaction.description ?? ""} -->
+    </p>
+    <p class="text-xs text-neutral-300 text-end w-2/5">
+      {new Date(goal.deadline).toLocaleString("es-CO")}
+    </p>
+  </div>
+</div>
