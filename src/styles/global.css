@@ -1,0 +1,67 @@
+@import "tailwindcss";
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+/* Personalización de la barra de scroll */
+::-webkit-scrollbar {
+  width: 0.6rem; /* Ancho de la barra de desplazamiento */
+  height: 0.6rem; /* Alto de la barra de desplazamiento para scroll horizontal */
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-slate-100 rounded-full;
+  border: 2px solid transparent; /* Espacio entre el "pulgar" y el fondo */
+  background-clip: padding-box; /* Clip para respetar el borde */
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-slate-900;
+}
+
+::-webkit-scrollbar-corner {
+  background-color: transparent; /* Mismo color que el fondo del track */
+}
+
+/* Para navegadores no basados en WebKit (Firefox) */
+.scroll-container {
+  scrollbar-width: thin; /* Grosor de la barra */
+  scrollbar-color: #f1f5f9 #0f172a; /* Color del "pulgar" y del fondo */
+}
+
+body {
+  background-color: white;
+}
+
+label {
+  @apply flex flex-col gap-1;
+}
+
+label > input,
+label > textarea {
+  @apply bg-neutral-50 p-1 px-2 rounded outline-red-100;
+}
+
+a {
+  @apply text-red-500 underline;
+}
+
+:root {
+  color-scheme: light;
+  background-color: #fff;
+  color: #000;
+}
+
+html {
+  background-color: #fff !important;
+  color-scheme: light !important;
+}
+@media (prefers-color-scheme: dark) {
+  html {
+    background-color: #fff !important;
+    color: #000 !important;
+  }
+}
+
+
+:root {
+     color-scheme: light only;
+}

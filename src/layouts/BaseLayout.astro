@@ -1,11 +1,9 @@
 ---
-//@ts-expect-error
 import LoadingIndicator from "astro-loading-indicator/component";
 import { ClientRouter } from "astro:transitions";
 import "../styles/global.css";
 
 const { title, desc } = Astro.props;
-const themeCookie = Astro.cookies.get("theme")?.value ?? "light";
 ---
 
 <html lang="es" about="acha">
@@ -18,7 +16,22 @@ const themeCookie = Astro.cookies.get("theme")?.value ?? "light";
     <meta name="viewport" content="width=device-width" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
     <meta name="generator" content={Astro.generator} />
-    <meta name="theme-color" content="#ffffff" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: light)"
+    />
+    <meta
+      name="theme-color"
+      content="#ffffff"
+      media="(prefers-color-scheme: dark)"
+    />
+    <meta name="color-scheme" content="light" />
+
     <link rel="manifest" href="/site.webmanifest" />
   </head>
   <ClientRouter />
@@ -28,9 +41,9 @@ const themeCookie = Astro.cookies.get("theme")?.value ?? "light";
     threshold={100}
   />
   <body>
-    <main class={themeCookie + " relative"}>
+    <main >
       <div
-        class={`flex flex-col min-h-screen bg-white dark:bg-slate-900 dark:text-white`}
+        class={`flex flex-col min-h-screen bg-white`}
       >
         <script is:inline>
           function changeTheme() {
@@ -43,9 +56,15 @@ const themeCookie = Astro.cookies.get("theme")?.value ?? "light";
           }
         </script>
 
-        <div class="h-[100dvh]">
+        <div class="min-h-dvh">
           <slot />
         </div>
+
+        <footer
+          class="bg-white flex flex-col gap-2 items-center justify-center min-h-[8dvh]"
+        >
+          <p>© Acha 2025</p>
+        </footer>
       </div>
     </main>
   </body>

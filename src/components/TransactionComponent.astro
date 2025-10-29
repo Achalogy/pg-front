@@ -1,0 +1,62 @@
+---
+import { IconCash, IconCoins } from "@tabler/icons-react";
+
+interface Props {
+  id: string;
+  type: "INCOME" | "EXPENSE";
+  amount: number;
+  category: string;
+  description: string;
+  date: Date;
+  createdAt: Date;
+}
+
+const transaction: {
+  id: string;
+  type: "INCOME" | "EXPENSE";
+  amount: number;
+  category: string;
+  description: string;
+  date: Date;
+  createdAt: Date;
+} = Astro.props;
+---
+
+<div class="flex flex-col rounded-xl bg-white p-3 px-4 gap-1">
+  <div class="flex justify-between items-center">
+    <div
+      class="flex items-center justify-center w-1/5 max-w-10 h-10 rounded-full bg-neutral-100"
+    >
+      {
+        transaction.type == "EXPENSE" ? (
+          <IconCash className="text-red-300" />
+        ) : (
+          <IconCoins className="text-green-300" />
+        )
+      }
+    </div>
+    <div class="w-2/5 text-xs">
+      <b>{transaction.type == "EXPENSE" ? "Gasto" : "Ingreso"}</b>
+      <p class="truncate text-neutral-600">
+        {transaction.category ?? "Sin categoria"}
+      </p>
+    </div>
+    <div class="w-2/5 flex justify-end">
+      <b
+        >${
+          Number(transaction.amount).toLocaleString("es-CO", {
+            minimumFractionDigits: 2,
+          })
+        }</b
+      >
+    </div>
+  </div>
+  <div class="flex justify-between">
+    <p class="text-xs text-neutral-300 w-3/5 line-clamp-2">
+      {transaction.description ?? ""}
+    </p>
+    <p class="text-xs text-neutral-300 text-end w-2/5">
+      {new Date(transaction.date).toLocaleString("es-CO")}
+    </p>
+  </div>
+</div>

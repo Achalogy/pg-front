@@ -1,0 +1,51 @@
+---
+import getBalance from "../api/user/getBalance";
+import { IconArrowDown, IconArrowUp } from "@tabler/icons-react";
+import pattern from "../../assets/money_doodles.webp";
+
+let balance: null | {
+  balance: number;
+  income: number;
+  expense: number;
+} = null;
+
+try {
+  balance = await getBalance(Astro);
+} catch (err) {}
+---
+
+{
+  balance ? (
+    <div class="relative flex flex-col gap-4 p-8 lg:p-10 rounded-[3rem] text-white bg-[#333333] overflow-hidden min-h-50">
+      <img
+        src={pattern.src}
+        alt=""
+        class="absolute inset-0 w-full h-full object-cover opacity-20"
+      />
+      <div class="relative z-10 flex flex-col gap-4 justify-between flex-1">
+        <p class="text-3xl font-semibold">
+          $
+          {balance.balance.toLocaleString("es-CO", {
+            minimumFractionDigits: 2,
+          })}
+        </p>
+        <div class="flex flex-col gap-2">
+          <p class="text-green-200 flex gap-2 items-center">
+            <IconArrowUp /> Ingresos: $
+            {balance.income.toLocaleString("es-CO", {
+              minimumFractionDigits: 2,
+            })}
+          </p>
+          <p class="text-red-200 flex gap-2 items-center">
+            <IconArrowDown /> Gastos: $
+            {balance.expense.toLocaleString("es-CO", {
+              minimumFractionDigits: 2,
+            })}
+          </p>
+        </div>
+      </div>
+    </div>
+  ) : (
+    <p>No se puede cargar el balance...</p>
+  )
+}

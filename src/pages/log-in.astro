@@ -1,0 +1,89 @@
+---
+import { actions } from "astro:actions";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import { isInputError } from "astro:actions";
+
+const result = Astro.getActionResult(actions["log-in"]);
+
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+const hasError = !!result?.error;
+const isInputErrorIndicator = hasError && isInputError(result?.error);
+
+if (result && !result.error) {
+  const { token } = result.data;
+
+  Astro.cookies.set("token", token, {
+    expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 7),
+  });
+  return Astro.redirect("/");
+}
+---
+
+<script define:vars={{ isInputErrorIndicator, hasError }}>
+  document.addEventListener("astro:page-load", () => {
+    if (!isInputErrorIndicator && hasError) {
+      alert("Credenciales Incorrectas");
+    }
+  });
+</script>
+
+<BaseLayout>
+  <div class="flex flex-col h-dvh w-full items-center justify-center p-4">
+    <div
+      class="flex flex-col gap-4 bg-neutral-100 p-8 rounded-md w-full lg:w-1/3"
+    >
+      <h1 class="text-xl">
+        <b>Iniciar Sesión</b>
+      </h1>
+
+      <form
+        method="post"
+        action={actions["log-in"]}
+        class="flex flex-col gap-2"
+      >
+        <label>
+          Correo
+          {
+            inputErrors.email && (
+              <p class="text-red-500" id="error">
+                {inputErrors.email.join(",")}
+              </p>
+            )
+          }
+          <input
+            type="email"
+            name="email"
+            transition:persist
+            aria-describedby="error"
+          />
+        </label>
+        <label>
+          Contraseña
+          {
+            inputErrors.password && (
+              <p class="text-red-500" id="error">
+                {inputErrors.password.join(",")}
+              </p>
+            )
+          }
+          <input
+            type="password"
+            name="password"
+            transition:persist
+            aria-describedby="error"
+          />
+        </label>
+
+        <p class="text-end">
+          ¿Aún no tienes cuenta? <a href="/sign-up">Crear cuenta</a>
+        </p>
+
+        <input
+          type="submit"
+          class="text-white font-semibold bg-red-300 rounded-md py-2 w-2/3 mx-auto mt-2"
+          value="Iniciar sesión"
+        />
+      </form>
+    </div>
+  </div>
+</BaseLayout>

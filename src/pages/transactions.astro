@@ -1,0 +1,111 @@
+---
+import { actions, isInputError } from "astro:actions";
+import LatestTransactionsList from "../components/LatestTransactionsList.astro";
+import BaseLayout from "../layouts/BaseLayout.astro";
+import headersWAuth from "../utils/headersWAuth";
+
+const result = Astro.getActionResult(actions["post-transaction"]);
+
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+const hasError = !!result?.error;
+const isInputErrorIndicator = hasError && isInputError(result?.error);
+
+try {
+  headersWAuth(Astro);
+} catch {
+  return Astro.redirect("/log-in");
+}
+---
+
+<script>
+  const input = document.getElementById("numInput");
+  input?.addEventListener("input", (e: any) => {
+    const value = e?.target?.value.replace(/\D/g, ""); // solo dígitos
+    const number = Number(value);
+    e.target.value = number ? `$${number.toLocaleString("es-CO")}` : "$";
+  });
+</script>
+
+<BaseLayout>
+  <a href="/" class="no-underline! fixed top-0">
+    <div
+      class="bg-white z-10 backdrop-blur-2xl w-dvw h-12 flex justify-center items-center"
+    >
+      <b class="text-black text-center">Volver al Inicio</b>
+    </div>
+  </a>
+  <div class="h-12"></div>
+  <div class="flex flex-col gap-6 bg-neutral-50 min-h-dvh p-4">
+    <div class="bg-white p-4 flex flex-col gap-4">
+      <h2 class="text-xl">
+        <b>Registrar Transacción</b>
+      </h2>
+
+      <form
+        class="flex flex-col gap-2"
+        method="POST"
+        action={actions["post-transaction"]}
+      >
+        <div class="flex gap-2 w-full max-w-[20rem] mx-auto">
+          <label class="flex-1">
+            <input
+              type="radio"
+              name="type"
+              checked="true"
+              class="hidden peer"
+              value="EXPENSE"
+            />
+            <div
+              class="w-full h-12 flex items-center justify-center bg-red-200 text-white rounded-lg cursor-pointer peer-checked:border-red-400 peer-checked:bg-red-300 border-2"
+            >
+              Gasto
+            </div>
+          </label>
+
+          <label class="flex-1">
+            <input
+              type="radio"
+              name="type"
+              class="hidden peer"
+              value="INCOME"
+            />
+            <div
+              class="w-full h-12 flex items-center justify-center bg-green-200 text-white rounded-lg cursor-pointer peer-checked:border-green-400 peer-checked:bg-green-300 border-2"
+            >
+              Ingreso
+            </div>
+          </label>
+        </div>
+
+        <label>
+          Cantidad
+          <input
+            id="numInput"
+            value="$0"
+            type="text"
+            class="bg-neutral-50"
+            name="amount"
+          /></label
+        >
+        <label>
+          Categoria
+          <input type="text" class="bg-neutral-50" name="category" /></label
+        >
+        <label>
+          Descripción
+          <textarea class="bg-neutral-50 resize-none" name="description"
+          ></textarea>
+        </label>
+
+        <input
+          type="submit"
+          value="Crear Transacción"
+          class="font-semibold w-2/3 rounded-lg bg-indigo-400 mx-auto text-white p-3 mt-4"
+        />
+      </form>
+    </div>
+    <div class="flex flex-col gap-4">
+      <LatestTransactionsList />
+    </div>
+  </div>
+</BaseLayout>
