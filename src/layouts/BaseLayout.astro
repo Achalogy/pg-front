@@ -41,10 +41,8 @@ const { title, desc } = Astro.props;
     threshold={100}
   />
   <body>
-    <main >
-      <div
-        class={`flex flex-col min-h-screen bg-white`}
-      >
+    <main>
+      <div class={`flex flex-col min-h-screen bg-white`}>
         <script is:inline>
           function changeTheme() {
             const value = `; ${document.cookie}`;
@@ -56,14 +54,16 @@ const { title, desc } = Astro.props;
           }
         </script>
 
-        <div class="min-h-dvh">
+        <div class="min-h-dvh max-w-240 w-full mx-auto">
           <slot />
         </div>
 
         <footer
           class="bg-white flex flex-col gap-2 items-center justify-center min-h-[8dvh]"
         >
-          <p>© Acha 2025</p>
+          <p>Proyecto de Innovación y Emprendimiento de TI</p>
+          <p>Pontificia Universidad Javeriana</p>
+          <p class="text-neutral-500">© Acha 2025</p>
         </footer>
       </div>
     </main>
