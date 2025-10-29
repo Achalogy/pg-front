@@ -132,7 +132,9 @@ const guias = [
               </button>
               <div class="p-4 contenido" style="display:none">
                 <p class="mb-2">{g.descripcion}</p>
-                <pre class="text-neutral-700 whitespace-pre-wrap">{g.ejemplo}</pre>
+                <pre class="text-neutral-700 whitespace-pre-wrap">
+                  {g.ejemplo}
+                </pre>
               </div>
             </div>
           ))
@@ -142,17 +144,22 @@ const guias = [
   </div>
 
   <script>
-    document.querySelectorAll(".collapsible").forEach((btn) => {
-      btn.addEventListener("click", () => {
-        const content = btn.nextElementSibling;
-        const icon = btn.querySelector(".toggle-icon");
-        if (content.style.display === "none" || content.style.display === "") {
-          content.style.display = "block";
-          icon.textContent = "-";
-        } else {
-          content.style.display = "none";
-          icon.textContent = "+";
-        }
+    document.addEventListener("astro:page-load", () => {
+      document.querySelectorAll(".collapsible").forEach((btn) => {
+        btn.addEventListener("click", () => {
+          const content = btn.nextElementSibling;
+          const icon = btn.querySelector(".toggle-icon");
+          if (
+            content.style.display === "none" ||
+            content.style.display === ""
+          ) {
+            content.style.display = "block";
+            icon.textContent = "-";
+          } else {
+            content.style.display = "none";
+            icon.textContent = "+";
+          }
+        });
       });
     });
   </script>
