@@ -17,11 +17,13 @@ if (result && !result.error) {
   });
   return Astro.redirect("/app");
 }
+
+const path = new URL(Astro.request.url).pathname
 ---
 
-<script define:vars={{ isInputErrorIndicator, hasError }}>
+<script define:vars={{ isInputErrorIndicator, hasError, path }}>
   document.addEventListener("astro:page-load", () => {
-    if (!isInputErrorIndicator && hasError) {
+    if (!isInputErrorIndicator && hasError && path.endsWith("log-in")) {
       alert("Credenciales Incorrectas");
     }
   });
