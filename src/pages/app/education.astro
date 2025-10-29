@@ -1,6 +1,5 @@
 ---
 import AppLayout from "../../layouts/AppLayout.astro";
-import TransactionsSection from "../../sections/app/TransactionsSection.astro";
 import headersWAuth from "../../utils/headersWAuth";
 
 try {
@@ -8,8 +7,153 @@ try {
 } catch {
   return Astro.redirect("/log-in");
 }
+
+// Conceptos enriquecidos
+const conceptos = [
+  {
+    titulo: "Ahorro",
+    descripcion:
+      "Dinero que reservas regularmente para cumplir metas futuras o enfrentar imprevistos.",
+    ejemplo:
+      "Ej: apartar $100.000 cada mes para un fondo de emergencia o un viaje planificado.",
+  },
+  {
+    titulo: "Inversión",
+    descripcion:
+      "Dinero que pones a trabajar para generar rendimientos adicionales, considerando riesgos.",
+    ejemplo:
+      "Ej: invertir en CDT, acciones, fondos mutuos o criptomonedas con estrategia de riesgo controlado.",
+  },
+  {
+    titulo: "Deuda",
+    descripcion:
+      "Obligación de pagar dinero prestado, usualmente con intereses, que debe ser planificada y controlada.",
+    ejemplo:
+      "Ej: usar tarjeta de crédito solo para emergencias y pagarla completa al mes para evitar intereses.",
+  },
+  {
+    titulo: "Presupuesto",
+    descripcion:
+      "Plan de control de ingresos y gastos que permite organizar el dinero, ahorrar y evitar endeudamiento.",
+    ejemplo:
+      "Ej: calcular ingresos mensuales, restar gastos fijos y variables, y definir cuánto ahorrar o invertir.",
+  },
+  {
+    titulo: "UVT",
+    descripcion:
+      "Unidad de Valor Tributario, utilizada por la DIAN para calcular impuestos y límites legales en Colombia.",
+    ejemplo:
+      "Ej: 1 UVT = COP 49.799 en 2025; sirve para determinar si debes declarar renta o para deducciones.",
+  },
+  {
+    titulo: "Base gravable",
+    descripcion:
+      "Cantidad sobre la cual se calcula el impuesto, definida como ingresos menos deducciones permitidas.",
+    ejemplo:
+      "Ej: ingresos $60.000.000 - deducciones $5.000.000 = base gravable $55.000.000.",
+  },
+];
+
+// Guías enriquecidas
+const guias = [
+  {
+    titulo: "Cómo declarar renta",
+    descripcion:
+      "Guía paso a paso para determinar si debes declarar renta y cómo hacerlo correctamente:",
+    ejemplo: `
+1. Verifica si tus ingresos, patrimonio o consumos superan los umbrales de la DIAN.
+2. Calcula tu base gravable: ingresos totales menos deducciones legales (salud, educación, pensiones, intereses de créditos hipotecarios).
+3. Determina la tarifa según UVT y calcula el impuesto aproximado.
+4. Llena el formulario de declaración (Formulario 210 para personas naturales en Colombia).
+5. Revisa los datos y envía electrónicamente a través de la plataforma de la DIAN.
+6. Guarda constancia y realiza el pago si aplica.`,
+  },
+  {
+    titulo: "Planificación de ahorro",
+    descripcion: "Cómo definir metas financieras claras y alcanzables:",
+    ejemplo: `
+1. Define un objetivo específico: fondo de emergencia, viaje, inversión, pago de deuda.
+2. Establece monto total y plazo para cumplir la meta.
+3. Calcula ahorro mensual o semanal necesario usando simuladores.
+4. Ajusta gastos y revisa progreso periódicamente.
+5. Mantén disciplina para cumplir metas sin afectar necesidades básicas.`,
+  },
+  {
+    titulo: "Presupuesto mensual efectivo",
+    descripcion:
+      "Organiza tus finanzas de forma práctica para mantener equilibrio entre ingresos, gastos y ahorro:",
+    ejemplo: `
+1. Lista todos tus ingresos fijos y variables del mes.
+2. Lista gastos fijos (arriendo, servicios) y variables (alimentación, transporte, ocio).
+3. Calcula porcentaje destinado al ahorro o inversión (ej: 20% de ingresos).
+4. Revisa y ajusta gastos según objetivos financieros y eventos imprevistos.
+5. Evalúa cada mes y ajusta el presupuesto según cambios de ingresos o gastos.`,
+  },
+];
 ---
 
 <AppLayout>
-  <TransactionsSection />
+  <div class="max-w-160 w-full mx-auto p-6 space-y-8">
+    <h1 class="text-3xl font-bold text-center mb-6">
+      Conceptos y Guías Financieras
+    </h1>
+
+    <!-- Conceptos -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Conceptos Clave</h2>
+      <div class="space-y-3">
+        {
+          conceptos.map((c, index) => (
+            <div class=" rounded-lg bg-white shadow-sm">
+              <button class="flex justify-between w-full p-4 font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-t-lg collapsible">
+                {c.titulo}
+                <span class="toggle-icon">+</span>
+              </button>
+              <div class="p-4 contenido" style="display:none">
+                <p class="mb-2">{c.descripcion}</p>
+                <p class="text-neutral-600 italic">{c.ejemplo}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+
+    <!-- Guías -->
+    <section>
+      <h2 class="text-2xl font-semibold mb-4">Guías Prácticas</h2>
+      <div class="space-y-3">
+        {
+          guias.map((g, index) => (
+            <div class=" rounded-lg bg-white shadow-sm">
+              <button class="flex justify-between w-full p-4 font-semibold bg-neutral-100 hover:bg-neutral-200 rounded-t-lg collapsible">
+                {g.titulo}
+                <span class="toggle-icon">+</span>
+              </button>
+              <div class="p-4 contenido" style="display:none">
+                <p class="mb-2">{g.descripcion}</p>
+                <pre class="text-neutral-700 whitespace-pre-wrap">{g.ejemplo}</pre>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </section>
+  </div>
+
+  <script>
+    document.querySelectorAll(".collapsible").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        const content = btn.nextElementSibling;
+        const icon = btn.querySelector(".toggle-icon");
+        if (content.style.display === "none" || content.style.display === "") {
+          content.style.display = "block";
+          icon.textContent = "-";
+        } else {
+          content.style.display = "none";
+          icon.textContent = "+";
+        }
+      });
+    });
+  </script>
 </AppLayout>
