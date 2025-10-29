@@ -1,0 +1,55 @@
+---
+import GoBackLayout from "../../../layouts/GoBackLayout.astro";
+import getGoalById from "../../../api/goals/getGoalById";
+import GoalComponent from "../../../components/GoalComponent.astro";
+
+const { id } = Astro.params;
+
+let goal: {
+  id: string;
+  name: string;
+  targetAmount: number;
+  deadline: Date;
+  completed: boolean;
+  createdAt: Date;
+} | null = null;
+
+try {
+  goal = await getGoalById(Astro, id ?? "");
+} catch {
+  return Astro.redirect("/app");
+}
+---
+
+<script>
+  import { actions } from "astro:actions";
+
+  document.addEventListener("astro:page-load", () => {
+    const deleteButton = document.getElementById("delete-button");
+
+    deleteButton?.addEventListener("click", async () => {
+      const id = deleteButton.dataset.id!;
+
+      const req = await actions["delete-goal"]({
+        id,
+      });
+
+      if (!req.error) window.location.href = "/app/goals";
+      else alert("Hubo un error al intentar eliminar la meta");
+    });
+  });
+</script>
+
+<GoBackLayout>
+  <div class="flex flex-col gap-2 p-4 w-full">
+    <GoalComponent {...goal} />
+
+    <button
+      id="delete-button"
+      data-id={goal.id}
+      class="bg-red-400 text-white font-semibold px-3 p-2 rounded-md"
+    >
+      Eliminar
+    </button>
+  </div>
+</GoBackLayout>

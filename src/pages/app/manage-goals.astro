@@ -1,0 +1,100 @@
+---
+import { actions, isInputError } from "astro:actions";
+import headersWAuth from "../../utils/headersWAuth";
+import GoBackLayout from "../../layouts/GoBackLayout.astro";
+import GoalList from "../../components/GoalList.astro";
+
+const result = Astro.getActionResult(actions["post-goal"]);
+
+const inputErrors = isInputError(result?.error) ? result.error.fields : {};
+const hasError = !!result?.error;
+const isInputErrorIndicator = hasError && isInputError(result?.error);
+
+console.log(result);
+
+try {
+  headersWAuth(Astro);
+} catch {
+  return Astro.redirect("/log-in");
+}
+---
+
+<script>
+  const input = document.getElementById("numInput");
+  input?.addEventListener("input", (e: any) => {
+    const value = e?.target?.value.replace(/\D/g, ""); // solo dígitos
+    const number = Number(value);
+    e.target.value = number ? `$${number.toLocaleString("es-CO")}` : "$";
+  });
+</script>
+
+<GoBackLayout>
+  <>
+    <!-- <div class="p-4">
+    <BalanceComponent
+      transition:name="balance-component"
+      transition:persist
+      transition:animate="slide"
+    />
+  </div> -->
+    <div class="flex flex-col gap-6 bg-neutral-50 min-h-dvh p-4">
+      <div class="bg-white p-4 flex flex-col gap-4">
+        <h2 class="text-xl">
+          <b>Registrar Meta</b>
+        </h2>
+
+        <form
+          class="flex flex-col gap-2"
+          method="POST"
+          action={actions["post-goal"]}
+        >
+          <!-- Nombre de la meta -->
+          <label>
+            Nombre de la meta
+            <input
+              type="text"
+              name="name"
+              placeholder="Ahorrar para computador"
+              class="bg-neutral-50 w-full p-2 rounded-md"
+              required
+            />
+          </label>
+
+          <!-- Monto objetivo -->
+          <label>
+            Monto objetivo
+            <input
+              id="numInput"
+              type="text"
+              name="targetAmount"
+              value="$0"
+              class="bg-neutral-50 w-full p-2 rounded-md"
+              required
+            />
+          </label>
+
+          <!-- Fecha límite -->
+          <label>
+            Fecha límite
+            <input
+              type="datetime-local"
+              name="deadline"
+              class="bg-neutral-50 w-full p-2 rounded-md"
+              required
+            />
+          </label>
+
+          <!-- Submit -->
+          <input
+            type="submit"
+            value="Crear Meta"
+            class="font-semibold w-2/3 rounded-lg bg-indigo-400 mx-auto text-white p-3 mt-4"
+          />
+        </form>
+      </div>
+      <div class="flex flex-col gap-4">
+        <GoalList />
+      </div>
+    </div>
+  </>
+</GoBackLayout>
