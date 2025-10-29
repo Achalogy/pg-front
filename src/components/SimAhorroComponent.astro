@@ -1,0 +1,42 @@
+---
+
+---
+
+<div class="w-full max-w-120  mx-auto p-4 bg-white rounded-lg space-y-4">
+  <h2 class="text-lg font-bold">Simulador de ahorro mensual</h2>
+
+  <label>
+    Monto a ahorrar cada mes (COP)
+    <input
+      type="number"
+      id="ahorro-monto"
+      class="bg-white p-2 rounded-md w-full"
+    />
+  </label>
+
+  <label>
+    Número de meses
+    <input
+      type="number"
+      id="ahorro-meses"
+      class="bg-white p-2 rounded-md w-full"
+    />
+  </label>
+
+  <button id="btn-ahorro" class="bg-indigo-500 text-white p-2 rounded-md"
+    >Calcular</button
+  >
+
+  <p id="ahorro-total">Total acumulado: COP 0</p>
+</div>
+
+<script>
+  const btnAhorro = document.getElementById("btn-ahorro");
+  btnAhorro.addEventListener("click", () => {
+    const monto = Number(document.getElementById("ahorro-monto").value) || 0;
+    const meses = Number(document.getElementById("ahorro-meses").value) || 0;
+    const total = monto * meses;
+    document.getElementById("ahorro-total").textContent =
+      "Total acumulado: COP " + total.toLocaleString();
+  });
+</script>

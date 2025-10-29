@@ -1,0 +1,162 @@
+---
+import { z } from "zod";
+import customCashFormat from "../utils/customCashFormat";
+
+const declaracionSchema = z.object({
+  ingresos: z.preprocess((v) => Number(v), z.number().min(0)),
+  patrimonio: z.preprocess((v) => Number(v), z.number().min(0)),
+  deducciones: z.preprocess((v) => Number(v), z.number().min(0).optional()),
+});
+
+let resultado = null;
+
+const valorUVT = 49799;
+const umbralIngresos = 1400 * valorUVT;
+const umbralPatrimonio = 4500 * valorUVT;
+
+if (Astro.request.method === "POST") {
+  const formData = await Astro.request.formData();
+  const data = Object.fromEntries(formData);
+
+  try {
+    const parsed = declaracionSchema.parse(data);
+
+    const debe =
+      parsed.ingresos >= umbralIngresos ||
+      parsed.patrimonio >= umbralPatrimonio;
+
+    if (debe) {
+      const baseGravable = parsed.ingresos - (parsed?.deducciones ?? 0);
+      const baseUVT = baseGravable / valorUVT;
+
+      let impuestoUVT = 0;
+
+      if (baseUVT <= 95) impuestoUVT = 0;
+      else if (baseUVT <= 150) impuestoUVT = (baseUVT - 95) * 0.19;
+      else if (baseUVT <= 360) impuestoUVT = 10.45 + (baseUVT - 150) * 0.28;
+      else if (baseUVT <= 640) impuestoUVT = 74.45 + (baseUVT - 360) * 0.33;
+      else if (baseUVT <= 945) impuestoUVT = 174.05 + (baseUVT - 640) * 0.35;
+      else if (baseUVT <= 2300) impuestoUVT = 277.3 + (baseUVT - 945) * 0.37;
+      else if (baseUVT <= 3350) impuestoUVT = 850.9 + (baseUVT - 2300) * 0.39;
+      else if (baseUVT <= 10000) impuestoUVT = 1376.4 + (baseUVT - 3350) * 0.41;
+      else impuestoUVT = 4119.1 + (baseUVT - 10000) * 0.43;
+
+      const valorEstimado = Math.round(impuestoUVT * valorUVT);
+      console.log({ valorUVT, baseUVT, valorEstimado, impuestoUVT });
+
+      resultado = `Debe declarar renta, aprox ${customCashFormat(valorEstimado)}`;
+    } else {
+      resultado = "No debe declarar renta";
+    }
+  } catch {
+    resultado = "Error en los datos ingresados";
+  }
+}
+---
+
+<b class="text-xl">Calculadora Renta</b>
+
+<form
+  method="POST"
+  class="flex flex-col gap-2 w-full max-w-120 mx-auto p-4 bg-white rounded-lg"
+>
+  <label>
+    Ingresos totales (Anual)
+    <input
+      type="number"
+      name="ingresos"
+      required
+      transition:persist
+      class="bg-white p-2 rounded-md w-full"
+    />
+  </label>
+  <label>
+    Patrimonio
+    <input
+      type="number"
+      name="patrimonio"
+      required
+      transition:persist
+      class="bg-white p-2 rounded-md w-full"
+    />
+  </label>
+  <label>
+    Deducciones (opcional)
+    <input
+      type="number"
+      transition:persist
+      name="deducciones"
+      class="bg-white p-2 rounded-md w-full"
+    />
+  </label>
+
+  <input
+    type="submit"
+    value="Calcular"
+    class="bg-indigo-500 text-white p-3 rounded-md mt-2"
+  />
+</form>
+
+{resultado && <p class="mt-4 font-semibold text-center">{resultado}</p>}
+
+<div class="max-w-2xl mx-auto p-4 bg-gray-100 rounded-lg space-y-4">
+  <h2 class="text-xl font-bold">
+    Conceptos clave para declarar renta en Colombia
+  </h2>
+
+  <div>
+    <strong>UVT (Unidad de Valor Tributario):</strong>
+    <p>
+      Es un valor de referencia que fija la DIAN cada año para calcular
+      impuestos. Para 2025, 1 UVT = COP 49.799.
+    </p>
+  </div>
+
+  <div>
+    <strong>Deducciones:</strong>
+    <p>
+      Son montos que la ley permite restar de tus ingresos para reducir la base
+      gravable. Por ejemplo: aportes a salud, pensión, intereses de créditos
+      educativos, donaciones, etc.
+    </p>
+  </div>
+
+  <div>
+    <strong>Base gravable:</strong>
+    <p>
+      Es el total de tus ingresos menos las deducciones. Sobre esta cantidad se
+      calcula el impuesto a pagar.
+    </p>
+  </div>
+
+  <div>
+    <strong>Umbrales de declaración:</strong>
+    <p>Para 2025, debes declarar si cumples al menos uno de estos criterios:</p>
+    <ul class="list-disc list-inside">
+      <li>
+        Ingresos totales > 1400 UVT ≈ COP {customCashFormat(umbralIngresos)}
+      </li>
+      <li>
+        Patrimonio bruto > 4500 UVT ≈ COP {customCashFormat(umbralPatrimonio)}
+      </li>
+    </ul>
+  </div>
+
+  <div>
+    <strong>Estimado de impuesto:</strong>
+    <p>
+      Se calcula aplicando la tarifa progresiva de renta sobre tu base gravable
+      expresada en UVT. La tarifa aumenta según rangos de ingresos, con cuotas
+      fijas por tramo y porcentaje sobre el excedente.
+    </p>
+  </div>
+
+  <div>
+    <strong>Nota:</strong>
+    <p>
+      Estos conceptos son útiles para tener un panorama educativo y no
+      reemplazan la asesoría tributaria profesional. Para la declaración
+      oficial, consulta la DIAN o un contador certificado.
+    </p>
+  </div>
+</div>
