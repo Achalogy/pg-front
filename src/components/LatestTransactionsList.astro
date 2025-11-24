@@ -2,38 +2,86 @@
 import getTransactions from "../api/transactions/getTransactions";
 import TransactionComponent from "./TransactionComponent.astro";
 
-let transactions: {
-  data: {
-    id: string;
-    type: "INCOME" | "EXPENSE";
-    amount: number;
-    category: string;
-    description: string;
-    date: Date;
-    createdAt: Date;
-    goalId?: string;
-    goal: {
-      name: string;
-    };
-  }[];
-  meta: {
-    hasNext: boolean;
-    totalCount: number;
-    count: number;
-    next: number;
-  };
-} | null = null;
+// --- Types ---
+type Transaction = {
+  id: string;
+  type: "INCOME" | "EXPENSE";
+  amount: number;
+  category: string;
+  description: string;
+  date: Date;
+  createdAt: Date;
+  goalId?: string;
+  goal: { name: string };
+};
+
+let transactionsData: Transaction[] = [];
 
 try {
-  transactions = await getTransactions(Astro);
-} catch (err) {}
+  const response = await getTransactions(Astro);
+  transactionsData = response?.data ?? [];
+} catch (err) {
+  console.error("Error fetching transactions", err);
+}
+
+// --- Lógica de Agrupación por Fecha ---
+const groupedTransactions = transactionsData.reduce(
+  (acc, transaction) => {
+    // Convertir fecha a string local (YYYY-MM-DD) para agrupar
+    const dateObj = new Date(transaction.date);
+    const dateKey = dateObj.toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+
+    // Lógica para "Hoy" y "Ayer"
+    const today = new Date().toLocaleDateString("es-CO", {
+      year: "numeric",
+      month: "long",
+      day: "numeric",
+    });
+    const yesterday = new Date(Date.now() - 86400000).toLocaleDateString(
+      "es-CO",
+      { year: "numeric", month: "long", day: "numeric" }
+    );
+
+    let displayDate = dateKey;
+    if (dateKey === today) displayDate = "Hoy";
+    else if (dateKey === yesterday) displayDate = "Ayer";
+
+    if (!acc[displayDate]) acc[displayDate] = [];
+    acc[displayDate].push(transaction);
+    return acc;
+  },
+  {} as Record<string, Transaction[]>
+);
+
+const dates = Object.keys(groupedTransactions);
 ---
 
-<>
+<div class="flex flex-col gap-6">
   {
-    transactions &&
-      (transactions?.data ?? [])?.map((x) => {
-        return <TransactionComponent {...x} />;
-      })
+    transactionsData.length === 0 ? (
+      <div class="text-center py-10 text-neutral-400">
+        <p>No hay transacciones recientes.</p>
+      </div>
+    ) : (
+      dates.map((dateLabel) => (
+        <div class="flex flex-col gap-3">
+          {/* Header de Fecha Sticky */}
+          <h3 class="sticky top-0 bg-neutral-50/95 backdrop-blur py-2 text-xs font-bold text-neutral-500 uppercase tracking-wide z-10">
+            {dateLabel}
+          </h3>
+
+          {/* Lista de Items */}
+          <div class="flex flex-col gap-3">
+            {groupedTransactions[dateLabel].map((t) => (
+              <TransactionComponent {...t} />
+            ))}
+          </div>
+        </div>
+      ))
+    )
   }
-</>
+</div>

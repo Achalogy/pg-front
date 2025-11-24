@@ -31,7 +31,12 @@ const { title, desc } = Astro.props;
       media="(prefers-color-scheme: dark)"
     />
     <meta name="color-scheme" content="light" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
 
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
     <link rel="manifest" href="/site.webmanifest" />
   </head>
   <ClientRouter />
@@ -42,7 +47,7 @@ const { title, desc } = Astro.props;
   />
   <body>
     <main>
-      <div class={`flex flex-col min-h-screen bg-neutral-50`}>
+      <div class={`flex flex-col min-h-screen bg-[#fdfdfd]`}>
         <script is:inline>
           function changeTheme() {
             const value = `; ${document.cookie}`;

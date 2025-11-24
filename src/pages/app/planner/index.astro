@@ -1,0 +1,947 @@
+---
+import {
+  IconUser,
+  IconPlus,
+  IconTrash,
+  IconCheck,
+  IconShoppingCart,
+  IconClock,
+  IconCrown,
+  IconInfoCircle,
+  IconArrowRight,
+} from "@tabler/icons-react";
+
+import GoBackLayout from "../../../layouts/GoBackLayout.astro";
+
+// --- DATOS MOCK ---
+
+const weekDays = [
+  { day: "Lunes", date: "25", active: true },
+  { day: "Martes", date: "26", active: false },
+  { day: "Miércoles", date: "27", active: false },
+  { day: "Jueves", date: "28", active: false },
+  { day: "Viernes", date: "29", active: false },
+];
+
+const suggestedRecipes = [
+  {
+    id: 1,
+    title: "Lentejas con Chorizo",
+    time: "45 min",
+    price: 18500,
+    ingredients: ["Lenteja 500g", "Chorizo Santa Rosa", "Papa Pastusa"],
+    img: "🍲",
+  },
+  {
+    id: 2,
+    title: "Pollo Sudado",
+    time: "30 min",
+    price: 22000,
+    ingredients: ["Pechuga de Pollo", "Tomate Chonto", "Cebolla Larga"],
+    img: "🍗",
+  },
+  {
+    id: 3,
+    title: "Pasta Boloñesa",
+    time: "25 min",
+    price: 16000,
+    ingredients: ["Spaghetti Doria", "Carne Molida", "Salsa Tomate"],
+    img: "🍝",
+  },
+];
+---
+
+<GoBackLayout>
+  <header class="app-header">
+    <div class="header-left">
+      <h1>Plan Semanal</h1>
+      <span class="subtitle">Noviembre 25 - 30</span>
+    </div>
+    <div class="header-right">
+      <button class="profile-btn active"><IconUser size={18} /> Perfil</button>
+    </div>
+  </header>
+
+  <div class="tabs-container">
+    <div class="tabs">
+      <button class="tab active" onclick="switchView('planner', this)"
+        >Mi Agenda</button
+      >
+      <button class="tab" onclick="switchView('cart', this)">
+        Carrito <span class="badge" id="nav-badge" style="display:none">0</span>
+      </button>
+    </div>
+  </div>
+
+  <main class="main-content">
+    <section id="view-planner" class="view active-view">
+      <div class="days-scroll">
+        {
+          weekDays.map((d, i) => (
+            <button class={`day-pill ${i === 0 ? "active" : ""}`}>
+              <span class="d-name">{d.day.substring(0, 3)}</span>
+              <span class="d-num">{d.date}</span>
+            </button>
+          ))
+        }
+      </div>
+
+      <div class="agenda-container">
+        <div class="meal-slot filled">
+          <div class="slot-time">Desayuno</div>
+          <div class="card-simple">
+            <div class="card-icon">☕</div>
+            <div class="card-info">
+              <h4>Huevos Pericos</h4>
+              <span>Hecho en casa</span>
+            </div>
+            <div class="card-check"><IconCheck size={16} /></div>
+          </div>
+        </div>
+
+        <div class="meal-slot" id="lunch-slot">
+          <div class="slot-time">Almuerzo</div>
+
+          <div class="slot-empty" id="lunch-empty">
+            <p>No has planeado tu almuerzo</p>
+            <button
+              class="btn-pill-primary"
+              onclick="openModal('recipe-modal')"
+            >
+              <IconPlus size={16} /> Agregar Receta
+            </button>
+          </div>
+
+          <div class="card-simple hidden" id="lunch-filled">
+            <div class="card-icon" id="filled-icon"></div>
+            <div class="card-info">
+              <h4 id="filled-title"></h4>
+              <span class="price-tag-sm" id="filled-price"></span>
+            </div>
+            <button class="btn-icon-danger" onclick="removeMeal()">
+              <IconTrash size={18} />
+            </button>
+          </div>
+        </div>
+
+        <div class="meal-slot">
+          <div class="slot-time">Cena</div>
+          <div class="slot-empty compact">
+            <p>Pendiente</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="view-cart" class="view">
+      <div class="cart-container">
+        <div class="list-divider">
+          <span>Canasta Básica</span>
+          <div class="line"></div>
+        </div>
+
+        <label class="cart-item">
+          <div class="checkbox-wrapper">
+            <input type="checkbox" checked disabled class="custom-check" />
+            <span class="checkmark"><IconCheck size={14} /></span>
+          </div>
+          <div class="product-thumb bg-yellow">🥚</div>
+          <div class="product-info">
+            <div class="p-header">
+              <h4>Huevos AA</h4>
+              <span class="badge-brand">Éxito</span>
+            </div>
+            <p class="p-details">x12 Unidades</p>
+            <div class="p-price-row">
+              <span class="price-final">$8.500</span>
+              <span class="price-original">$9.200</span>
+            </div>
+          </div>
+        </label>
+
+        <div id="dynamic-cart-items"></div>
+
+        <div style="height: 100px;"></div>
+      </div>
+
+      <div class="checkout-bar">
+        <div class="total-info-enhanced">
+          <div class="savings-row">
+            <span class="label-normal">Precio Normal:</span>
+            <span class="price-strike" id="normal-price">$10.200</span>
+          </div>
+          <div class="final-price-row">
+            <strong id="cart-total">$8.500</strong>
+            <span class="badge-savings" id="savings-badge">Ahorras $1.700</span>
+          </div>
+        </div>
+        <button class="btn-checkout-exito"> Pagar en Éxito </button>
+      </div>
+    </section>
+  </main>
+
+  <div class="modal-backdrop" id="recipe-modal">
+    <div class="modal-sheet">
+      <div class="modal-handle"></div>
+      <h3>Sugerencias del día</h3>
+      <p class="modal-subtitle">Basado en tus gustos</p>
+
+      <div class="recipes-grid">
+        {
+          suggestedRecipes.map((r) => (
+            <div
+              class="card-recipe"
+              onclick={`selectRecipe(${JSON.stringify(r)})`}
+            >
+              <div class="r-img">{r.img}</div>
+              <div class="r-info">
+                <h4>{r.title}</h4>
+                <span class="r-meta">
+                  <IconClock size={14} /> {r.time}
+                </span>
+              </div>
+              <div class="r-action">
+                <span class="r-price">${r.price.toLocaleString()}</span>
+                <IconPlus size={18} />
+              </div>
+            </div>
+          ))
+        }
+      </div>
+      <button class="btn-close" onclick="closeModal('recipe-modal')"
+        >Cancelar</button
+      >
+    </div>
+  </div>
+
+  <script is:inline>
+    // --- Navegación ---
+    function switchView(viewId, btn) {
+      document
+        .querySelectorAll(".view")
+        .forEach((v) => v.classList.remove("active-view"));
+      document.getElementById("view-" + viewId).classList.add("active-view");
+
+      document
+        .querySelectorAll(".tab")
+        .forEach((t) => t.classList.remove("active"));
+      btn.classList.add("active");
+    }
+
+    // --- Modales ---
+    function openModal(id) {
+      document.getElementById(id).classList.add("open");
+    }
+    function closeModal(id) {
+      document.getElementById(id).classList.remove("open");
+    }
+
+    document.querySelectorAll(".modal-backdrop").forEach((m) => {
+      m.addEventListener("click", (e) => {
+        if (e.target === m) m.classList.remove("open");
+      });
+    });
+
+    // --- Lógica Carrito y Recetas ---
+    function selectRecipe(data) {
+      // 1. Actualizar Planner
+      document.getElementById("lunch-empty").style.display = "none";
+      const filled = document.getElementById("lunch-filled");
+      filled.classList.remove("hidden");
+      document.getElementById("filled-title").innerText = data.title;
+      document.getElementById("filled-icon").innerText = data.img;
+      document.getElementById("filled-price").innerText =
+        "$" + data.price.toLocaleString();
+
+      closeModal("recipe-modal");
+
+      // 2. Generar items del carrito
+      updateCart(data);
+
+      // 3. Notificación visual (opcional)
+      alert("Ingredientes agregados al carrito");
+      // Cambiar a vista carrito automáticamente para ver el efecto
+      // switchView('cart', document.querySelectorAll('.tab')[1]);
+    }
+
+    function removeMeal() {
+      document.getElementById("lunch-empty").style.display = "block";
+      document.getElementById("lunch-filled").classList.add("hidden");
+      resetCart();
+    }
+
+    function updateCart(data) {
+      const container = document.getElementById("dynamic-cart-items");
+
+      // Creamos el HTML como string.
+      // IMPORTANTE: Las clases usadas aquí (cart-item, product-thumb, etc)
+      // funcionarán gracias a <style is:global>
+      let html = `
+          <div class="list-divider fade-in">
+            <span>Ingredientes: ${data.title}</span>
+            <div class="line"></div>
+          </div>
+        `;
+
+      data.ingredients.forEach((ing) => {
+        // Simulamos precios
+        const price = Math.round(data.price / data.ingredients.length);
+        const oldPrice = Math.round(price * 1.15);
+
+        html += `
+            <label class="cart-item fade-in">
+              <div class="checkbox-wrapper">
+                <input type="checkbox" checked class="custom-check">
+                <span class="checkmark">✔</span>
+              </div>
+              <div class="product-thumb bg-orange">📦</div>
+              <div class="product-info">
+                <div class="p-header">
+                  <h4>${ing}</h4>
+                  <span class="badge-brand">Éxito</span>
+                </div>
+                <p class="p-details">Paquete x1 • Receta</p>
+                <div class="p-price-row">
+                  <span class="price-final">$${price.toLocaleString()}</span>
+                  <span class="price-original">$${oldPrice.toLocaleString()}</span>
+                </div>
+              </div>
+            </label>
+          `;
+      });
+
+      container.innerHTML = html;
+
+      // Actualizar Badge
+      const badge = document.getElementById("nav-badge");
+      badge.style.display = "inline-flex";
+      badge.innerText = (1 + data.ingredients.length).toString();
+
+      // Actualizar Barra de Precios
+      const total = 8500 + data.price;
+      const totalOld = Math.round(total * 1.15);
+      document.getElementById("cart-total").innerText =
+        "$" + total.toLocaleString();
+      document.getElementById("normal-price").innerText =
+        "$" + totalOld.toLocaleString();
+      document.getElementById("savings-badge").innerText =
+        "AHORRAS $" + (totalOld - total).toLocaleString();
+    }
+
+    function resetCart() {
+      document.getElementById("dynamic-cart-items").innerHTML = "";
+      document.getElementById("nav-badge").style.display = "none";
+      document.getElementById("cart-total").innerText = "$8.500";
+      document.getElementById("normal-price").innerText = "$10.200";
+      document.getElementById("savings-badge").innerText = "AHORRAS $1.700";
+    }
+  </script>
+</GoBackLayout>
+
+<style is:global>
+  /* --- RESET & VARS --- */
+  :root {
+    --primary: #2563eb;
+    --success: #10b981;
+    --danger: #ef4444;
+    --bg: #f8fafc;
+    --card: #ffffff;
+    --text: #1e293b;
+    --text-muted: #64748b;
+    --border: #e2e8f0;
+    --exito: #ffe600;
+  }
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+  body {
+    font-family: "Inter", sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding-bottom: 20px;
+  }
+  button {
+    font-family: inherit;
+    -webkit-tap-highlight-color: transparent;
+  }
+
+  /* --- HEADER --- */
+  .app-header {
+    background: var(--card);
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border);
+  }
+  .app-header h1 {
+    font-size: 1.2rem;
+    font-weight: 800;
+    margin: 0;
+  }
+  .subtitle {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .profile-btn {
+    background: #f1f5f9;
+    border: none;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.8rem;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text);
+  }
+
+  /* --- TABS --- */
+  .tabs-container {
+    position: sticky;
+    top: 0;
+    padding: 10px 20px;
+    z-index: 10;
+    background: rgba(248, 250, 252, 0.95);
+    backdrop-filter: blur(5px);
+  }
+  .tabs {
+    background: #e2e8f0;
+    padding: 4px;
+    border-radius: 12px;
+    display: flex;
+  }
+  .tab {
+    flex: 1;
+    border: none;
+    background: none;
+    padding: 10px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    position: relative;
+  }
+  .tab.active {
+    background: var(--card);
+    color: var(--text);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  }
+  .badge {
+    background: var(--danger);
+    color: white;
+    font-size: 0.6rem;
+    padding: 2px 6px;
+    border-radius: 10px;
+    position: absolute;
+    top: 4px;
+    right: 4px;
+    font-weight: 700;
+  }
+
+  /* --- LAYOUT --- */
+  .main-content {
+    max-width: 600px;
+    margin: 0 auto;
+    padding: 20px;
+  }
+  .view {
+    display: none;
+    animation: fadeIn 0.3s ease;
+  }
+  .active-view {
+    display: block;
+  }
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+      transform: translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+  .fade-in {
+    animation: fadeIn 0.3s ease;
+  }
+  .hidden {
+    display: none !important;
+  }
+
+  /* --- PLANNER UI --- */
+  .days-scroll {
+    display: flex;
+    gap: 10px;
+    overflow-x: auto;
+    margin-bottom: 25px;
+    padding-bottom: 5px;
+    scrollbar-width: none;
+  }
+  .days-scroll::-webkit-scrollbar {
+    display: none;
+  }
+
+  .day-pill {
+    min-width: 55px;
+    background: var(--card);
+    border: 1px solid var(--border);
+    padding: 10px 0;
+    border-radius: 12px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: 0.2s;
+    flex-shrink: 0;
+  }
+  .day-pill.active {
+    background: var(--text);
+    color: white;
+    border-color: var(--text);
+  }
+  .d-name {
+    font-size: 0.7rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 2px;
+  }
+  .d-num {
+    font-size: 1.1rem;
+    font-weight: 800;
+  }
+
+  .agenda-container {
+    padding-left: 10px;
+  }
+
+  .meal-slot {
+    margin-bottom: 25px;
+    position: relative;
+    padding-left: 20px;
+    border-left: 2px solid var(--border);
+  }
+  .meal-slot.filled {
+    border-left-color: var(--primary);
+  }
+
+  /* Arreglo Overflow Texto */
+  .slot-time {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+  .slot-time::before {
+    content: "";
+    position: absolute;
+    left: -25px;
+    width: 8px;
+    height: 8px;
+    background: var(--border);
+    border-radius: 50%;
+    border: 2px solid var(--bg);
+  }
+  .meal-slot.filled .slot-time {
+    color: var(--primary);
+  }
+  .meal-slot.filled .slot-time::before {
+    background: var(--primary);
+  }
+
+  .slot-empty {
+    border: 2px dashed var(--border);
+    border-radius: 12px;
+    padding: 20px;
+    text-align: center;
+  }
+  .slot-empty.compact {
+    padding: 10px;
+  }
+  .slot-empty p {
+    font-size: 0.9rem;
+    color: var(--text-muted);
+    margin-bottom: 10px;
+  }
+
+  .card-simple {
+    background: var(--card);
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.03);
+    border: 1px solid var(--border);
+  }
+  .card-icon {
+    font-size: 1.5rem;
+    background: #f1f5f9;
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    flex-shrink: 0;
+  }
+  .card-info {
+    flex: 1;
+  }
+  .card-info h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 2px;
+  }
+  .card-info span {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+  }
+  .price-tag-sm {
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 6px;
+    border-radius: 4px;
+    font-weight: 700;
+    font-size: 0.75rem;
+  }
+
+  .btn-pill-primary {
+    background: var(--text);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-weight: 600;
+    font-size: 0.85rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .btn-icon-danger {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: none;
+    background: #fee2e2;
+    color: #b91c1c;
+    display: grid;
+    place-items: center;
+    cursor: pointer;
+  }
+
+  /* --- CART UI (ESTILOS GLOBALES NECESARIOS PARA JS) --- */
+  .cart-container {
+    padding-bottom: 20px;
+  }
+  .list-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 20px 0 10px;
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-weight: 700;
+    text-transform: uppercase;
+  }
+  .list-divider .line {
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  .cart-item {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    background: var(--card);
+    padding: 10px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    margin-bottom: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .cart-item:active {
+    transform: scale(0.98);
+  }
+
+  .checkbox-wrapper {
+    width: 20px;
+    height: 20px;
+    position: relative;
+    margin-right: 12px;
+  }
+  .custom-check {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0;
+    cursor: pointer;
+    z-index: 2;
+  }
+  .checkmark {
+    position: absolute;
+    inset: 0;
+    border: 2px solid #cbd5e1;
+    border-radius: 6px;
+    display: grid;
+    place-items: center;
+    color: white;
+    font-size: 0.7rem;
+    transition: 0.2s;
+  }
+  .custom-check:checked + .checkmark {
+    background: var(--success);
+    border-color: var(--success);
+  }
+
+  .product-thumb {
+    width: 45px;
+    height: 45px;
+    border-radius: 8px;
+    display: grid;
+    place-items: center;
+    font-size: 1.2rem;
+    margin-right: 12px;
+    flex-shrink: 0;
+  }
+  .bg-yellow {
+    background: #fef9c3;
+  }
+  .bg-orange {
+    background: #ffedd5;
+  }
+
+  .product-info {
+    flex: 1;
+  }
+  .p-header {
+    display: flex;
+    justify-content: space-between;
+  }
+  .p-header h4 {
+    font-size: 0.9rem;
+    font-weight: 700;
+    margin: 0;
+  }
+  .badge-brand {
+    font-size: 0.6rem;
+    background: var(--exito);
+    color: black;
+    padding: 1px 4px;
+    border-radius: 4px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .p-details {
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    margin: 2px 0 4px;
+  }
+  .p-price-row {
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .price-final {
+    color: var(--text);
+  }
+  .price-original {
+    text-decoration: line-through;
+    color: #cbd5e1;
+    font-size: 0.75rem;
+    margin-left: 6px;
+  }
+
+  .recipe-tag {
+    background: #eff6ff;
+    color: var(--primary);
+    font-size: 0.75rem;
+    padding: 4px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+    display: inline-block;
+    margin-bottom: 10px;
+  }
+
+  /* Sticky Checkout */
+  .checkout-bar {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    background: white;
+    padding: 15px 20px;
+    border-top: 1px solid var(--border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+    box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.05);
+    z-index: 50;
+    padding-bottom: max(15px, env(safe-area-inset-bottom));
+  }
+  .total-info-enhanced {
+    display: flex;
+    flex-direction: column;
+  }
+  .savings-row {
+    font-size: 0.7rem;
+    color: var(--text-muted);
+    display: flex;
+    gap: 5px;
+  }
+  .price-strike {
+    text-decoration: line-through;
+  }
+  .final-price-row strong {
+    font-size: 1.3rem;
+    line-height: 1.1;
+  }
+  .badge-savings {
+    font-size: 0.6rem;
+    background: #dcfce7;
+    color: #166534;
+    padding: 2px 4px;
+    border-radius: 4px;
+    font-weight: 800;
+    border: 1px solid #bbf7d0;
+    margin-left: 5px;
+  }
+
+  .btn-checkout-exito {
+    flex: 1;
+    background: var(--exito);
+    color: black;
+    border: none;
+    font-weight: 800;
+    height: 45px;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 3px 0 #ca8a04;
+    transition: 0.1s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .btn-checkout-exito:active {
+    transform: translateY(3px);
+    box-shadow: none;
+  }
+
+  /* --- MODALS --- */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 100;
+    display: none;
+    align-items: flex-end;
+  }
+  .modal-backdrop.open {
+    display: flex;
+  }
+  .modal-sheet {
+    background: white;
+    width: 100%;
+    border-radius: 20px 20px 0 0;
+    padding: 25px;
+    animation: slideUp 0.3s;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  @keyframes slideUp {
+    from {
+      transform: translateY(100%);
+    }
+    to {
+      transform: translateY(0);
+    }
+  }
+  .modal-handle {
+    width: 40px;
+    height: 5px;
+    background: #e2e8f0;
+    border-radius: 10px;
+    margin: 0 auto 10px;
+  }
+  .modal-subtitle {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    margin-bottom: 20px;
+  }
+
+  .recipes-grid {
+    display: grid;
+    gap: 15px;
+    margin: 20px 0;
+  }
+  .card-recipe {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    padding: 15px;
+    border: 1px solid var(--border);
+    border-radius: 12px;
+    cursor: pointer;
+    transition: 0.2s;
+  }
+  .card-recipe:active {
+    background: #f8fafc;
+  }
+  .r-img {
+    font-size: 2rem;
+    background: #f8fafc;
+    width: 50px;
+    height: 50px;
+    display: grid;
+    place-items: center;
+    border-radius: 8px;
+    flex-shrink: 0;
+  }
+  .r-info {
+    flex: 1;
+  }
+  .r-info h4 {
+    font-weight: 700;
+    margin-bottom: 4px;
+    font-size: 0.95rem;
+  }
+  .r-meta {
+    font-size: 0.8rem;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .r-action {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 5px;
+  }
+  .r-price {
+    font-weight: 700;
+    color: var(--success);
+    font-size: 0.9rem;
+  }
+
+  .btn-close {
+    width: 100%;
+    padding: 12px;
+    border: none;
+    background: #f1f5f9;
+    border-radius: 10px;
+    font-weight: 600;
+    cursor: pointer;
+  }
+</style>

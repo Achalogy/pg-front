@@ -3,21 +3,24 @@ import { IconPlus } from "@tabler/icons-react";
 import GoalList from "../../components/GoalList.astro";
 ---
 
-<div class="flex flex-col gap-6 p-4">
-  <div class="flex items-center justify-between text-[1.5rem]/[0.1rem]">
-    <h2>
-      <b>Metas</b>
-    </h2>
-    <a href="/app/manage-goals" class="no-underline!">
+<div class="flex flex-col gap-6 p-4 pb-24">
+  <div class="flex items-center justify-between">
+    <div>
+      <h2 class="text-2xl font-bold text-neutral-800">Metas</h2>
+      <p class="text-sm text-neutral-500">Tus objetivos de ahorro</p>
+    </div>
+
+    <a href="/app/manage-goals" class="no-underline! group">
       <div
-        class="flex items-center justify-center h-8 rounded-full bg-white text-neutral-500 mt-2 text-xs gap-2 px-2 select-none"
+        class="flex items-center justify-center h-10 w-10 md:w-auto md:px-4 rounded-full bg-black text-white shadow-lg shadow-neutral-300/50 transition-transform active:scale-95 group-hover:bg-neutral-800"
       >
-        <IconPlus />
-        <p class="mb-1">agregar</p>
-      </div></a
-    >
+        <IconPlus size={20} />
+        <span class="hidden md:block ml-2 text-sm font-medium">Nueva Meta</span>
+      </div>
+    </a>
   </div>
-  <div class="flex flex-col gap-4">
+
+  <div class="flex flex-col">
     <GoalList />
   </div>
 </div>

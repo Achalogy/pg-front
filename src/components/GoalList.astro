@@ -1,34 +1,43 @@
 ---
 import getGoals from "../api/goals/getGoals";
 import GoalComponent from "./GoalComponent.astro";
+import { IconTrophy } from "@tabler/icons-react";
 
-let goals: {
-  data: {
-    id: string;
-    name: string;
-    targetAmount: number;
-    deadline: Date;
-    completed: boolean;
-    createdAt: Date;
-  }[],
-  meta: {
-    hasNext: boolean;
-    totalCount: number;
-    count: number;
-    next: number;
-  };
-} | null = null;
+// Definir interfaz para evitar el 'any'
+interface Goal {
+  id: string;
+  name: string;
+  targetAmount: number;
+  currentBalance: number; // Asegúrate de que tu API devuelva esto
+  deadline: Date;
+  completed: boolean;
+  createdAt: Date;
+}
+
+let goalsData: Goal[] = [];
 
 try {
-  goals = await getGoals(Astro);
-} catch (err) {}
+  const response = await getGoals(Astro);
+  goalsData = (response?.data ?? []) as any;
+} catch (err) {
+  console.error("Error fetching goals", err);
+}
 ---
 
-<>
+<div class="flex flex-col gap-4">
   {
-    goals &&
-      (goals?.data ?? [])?.map((x) => {
-        return <GoalComponent {...x} />;
-      })
+    goalsData.length === 0 ? (
+      <div class="flex flex-col items-center justify-center py-12 text-center border-2 border-dashed border-neutral-200 rounded-2xl bg-neutral-50">
+        <div class="bg-white p-3 rounded-full shadow-sm mb-3">
+          <IconTrophy size={32} className="text-neutral-300" />
+        </div>
+        <p class="font-bold text-neutral-600">Sin metas activas</p>
+        <p class="text-sm text-neutral-400 px-8">
+          Define un objetivo y empieza a ahorrar hoy mismo.
+        </p>
+      </div>
+    ) : (
+      goalsData.map((goal) => <GoalComponent {...goal} />)
+    )
   }
-</>
+</div>

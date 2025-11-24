@@ -1,0 +1,445 @@
+---
+// Importación de Iconos adicionales necesarios
+import {
+  IconBuildingBank,
+  IconLock,
+  IconTrendingUp,
+  IconInfoCircle,
+  IconCircleCheck,
+  IconCrown,
+} from "@tabler/icons-react";
+
+const cdtRates = [
+  {
+    bank: "Banco de Bogotá",
+    rate: "10.5% E.A.",
+    term: "360 días",
+    logo: "🏦",
+    type: "free",
+  },
+  {
+    bank: "NuBank (Cajita)",
+    rate: "13.0% E.A.",
+    term: "A la vista",
+    logo: "🟪",
+    type: "free",
+  },
+  {
+    bank: "Cooperativa X",
+    rate: "14.5% E.A.",
+    term: "180 días",
+    logo: "🔐",
+    type: "premium",
+  },
+  {
+    bank: "Finandina",
+    rate: "13.8% E.A.",
+    term: "360 días",
+    logo: "🔐",
+    type: "premium",
+  },
+  {
+    bank: "Credifamilia",
+    rate: "14.2% E.A.",
+    term: "540 días",
+    logo: "🔐",
+    type: "premium",
+  },
+];
+---
+
+<section id="view-invest" class="content-view">
+  <div class="section-header-app">
+    <div>
+      <h2>Rentabilidad</h2>
+      <p>Haz crecer tu dinero sin riesgo.</p>
+    </div>
+    <div class="icon-header-bg">
+      <IconTrendingUp size={24} color="#10b981" />
+    </div>
+  </div>
+
+  <div class="edu-card-mini">
+    <IconInfoCircle size={20} />
+    <span
+      >Tip: La inflación actual es del 9.2%. Busca tasas superiores a eso.</span
+    >
+  </div>
+
+  <div class="invest-list">
+    <h3 class="list-title">Mejores Tasas Hoy</h3>
+
+    {
+      cdtRates.map((item) => (
+        <div
+          class={`invest-card ${item.type === "premium" ? "locked-card" : ""}`}
+          onclick={item.type === "premium" ? "openPremiumModal()" : ""}
+        >
+          <div class="bank-icon">{item.logo}</div>
+
+          <div class="bank-info">
+            <h4>{item.type === "premium" ? "Entidad Top" : item.bank}</h4>
+            <span class="term-badge">{item.term}</span>
+          </div>
+
+          <div class="rate-info">
+            <span class="rate-label">E.A.</span>
+            <span
+              class={`rate-value ${item.type === "premium" ? "blur-val" : ""}`}
+            >
+              {item.rate}
+            </span>
+          </div>
+
+          {item.type === "premium" && (
+            <div class="lock-overlay">
+              <IconLock size={18} />
+              <span>Ver</span>
+            </div>
+          )}
+        </div>
+      ))
+    }
+  </div>
+
+  <div class="premium-banner-box">
+    <div class="crown-icon"><IconCrown size={24} color="#f59e0b" /></div>
+    <div class="p-text">
+      <strong>Sé Inversionista PRO</strong>
+      <p>Accede a cooperativas con tasas del +14%</p>
+    </div>
+    <button class="btn-upgrade" onclick="openPremiumModal()">$12k</button>
+  </div>
+</section>
+
+<div class="modal-backdrop" id="premium-modal">
+  <div class="modal-sheet premium-sheet">
+    <div class="modal-handle"></div>
+
+    <div class="premium-header">
+      <div class="crown-circle">
+        <IconCrown size={40} color="white" />
+      </div>
+      <h2>Desbloquea el Mercado</h2>
+      <p>Invierte como un experto por menos de lo que cuesta un almuerzo.</p>
+    </div>
+
+    <ul class="premium-features">
+      <li>
+        <IconCircleCheck size={18} color="#10b981" /> Contacto directo de Asesores
+      </li>
+      <li>
+        <IconCircleCheck size={18} color="#10b981" /> Tasas ocultas de Cooperativas
+      </li>
+      <li>
+        <IconCircleCheck size={18} color="#10b981" /> Calculadora de Retención
+      </li>
+    </ul>
+
+    <div class="pricing-action">
+      <div class="price-tag-modal">
+        <span class="old">$25.000</span>
+        <span class="new">$12.900 COP</span>
+        <small>/mes</small>
+      </div>
+      <button class="btn-pay-now"> Hacerme Premium </button>
+    </div>
+
+  </div>
+</div>
+
+<script is:inline>
+  const pModal = document.getElementById("premium-modal");
+
+  function openPremiumModal() {
+    pModal.classList.add("open");
+  }
+
+  function closePremiumModal() {
+    pModal.classList.remove("open");
+  }
+
+  pModal.addEventListener("click", (e) => {
+    if (e.target === pModal) closePremiumModal();
+  });
+</script>
+
+<style>
+  /* Header Sección App */
+  .section-header-app {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+  .section-header-app h2 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #1e293b;
+  }
+  .section-header-app p {
+    color: #64748b;
+    font-size: 0.9rem;
+    margin: 0;
+  }
+  .icon-header-bg {
+    width: 40px;
+    height: 40px;
+    background: #ecfdf5;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+
+  /* Mini Edu Card */
+  .edu-card-mini {
+    background: #eff6ff;
+    color: #1e40af;
+    padding: 12px;
+    border-radius: 12px;
+    display: flex;
+    gap: 10px;
+    font-size: 0.8rem;
+    align-items: start;
+    margin-bottom: 25px;
+    border: 1px solid #dbeafe;
+  }
+
+  /* Lista de Inversiones */
+  .list-title {
+    font-size: 1rem;
+    color: #334155;
+    margin-bottom: 15px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    font-weight: 700;
+  }
+
+  .invest-card {
+    background: white;
+    padding: 15px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04);
+    position: relative;
+    border: 1px solid #e2e8f0;
+    transition: transform 0.2s;
+    overflow: hidden;
+  }
+  .invest-card:active {
+    transform: scale(0.98);
+  }
+
+  .bank-icon {
+    font-size: 1.5rem;
+    background: #f8fafc;
+    width: 45px;
+    height: 45px;
+    border-radius: 10px;
+    display: grid;
+    place-items: center;
+  }
+
+  .bank-info {
+    flex: 1;
+  }
+  .bank-info h4 {
+    font-size: 0.95rem;
+    font-weight: 700;
+    margin-bottom: 4px;
+    color: #1e293b;
+  }
+  .term-badge {
+    background: #f1f5f9;
+    color: #64748b;
+    font-size: 0.7rem;
+    padding: 2px 8px;
+    border-radius: 6px;
+    font-weight: 600;
+  }
+
+  .rate-info {
+    text-align: right;
+  }
+  .rate-label {
+    display: block;
+    font-size: 0.7rem;
+    color: #94a3b8;
+    font-weight: 600;
+  }
+  .rate-value {
+    font-size: 1.1rem;
+    font-weight: 800;
+    color: #10b981;
+  }
+
+  /* Estilos Premium Locked */
+  .locked-card {
+    background: linear-gradient(145deg, #ffffff 0%, #f3f4f6 100%);
+    border-color: #fcd34d;
+    cursor: pointer;
+  }
+  .blur-val {
+    filter: blur(6px);
+    user-select: none;
+    opacity: 0.7;
+  }
+
+  .lock-overlay {
+    position: absolute;
+    right: 15px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: #fef3c7;
+    color: #d97706;
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+  }
+
+  /* Premium Banner Inline */
+  .premium-banner-box {
+    background: #1e293b;
+    color: white;
+    padding: 15px;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-top: 20px;
+    box-shadow: 0 4px 15px rgba(30, 41, 59, 0.3);
+  }
+  .crown-icon {
+    background: rgba(255, 255, 255, 0.1);
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: grid;
+    place-items: center;
+  }
+  .p-text {
+    flex: 1;
+  }
+  .p-text strong {
+    display: block;
+    font-size: 0.95rem;
+    color: #fcd34d;
+  }
+  .p-text p {
+    font-size: 0.75rem;
+    color: #cbd5e1;
+    margin: 0;
+  }
+  .btn-upgrade {
+    background: #fcd34d;
+    color: #1e293b;
+    border: none;
+    font-weight: 800;
+    padding: 8px 12px;
+    border-radius: 8px;
+    cursor: pointer;
+  }
+
+  /* Modal Styles Specifics */
+  .premium-sheet {
+    text-align: center;
+  }
+  .premium-header {
+    margin-bottom: 25px;
+  }
+  .crown-circle {
+    background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+    width: 70px;
+    height: 70px;
+    border-radius: 50%;
+    margin: 0 auto 15px;
+    display: grid;
+    place-items: center;
+    box-shadow: 0 4px 15px rgba(245, 158, 11, 0.4);
+  }
+  .premium-header h2 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+    color: #1e293b;
+  }
+  .premium-header p {
+    font-size: 0.9rem;
+    color: #64748b;
+    max-width: 80%;
+    margin: 0 auto;
+  }
+
+  .premium-features {
+    text-align: left;
+    background: #f8fafc;
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+  }
+  .premium-features li {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+    font-size: 0.9rem;
+    color: #334155;
+  }
+  .premium-features li:last-child {
+    margin-bottom: 0;
+  }
+
+  .pricing-action {
+    background: #1e293b;
+    padding: 15px;
+    border-radius: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+  }
+  .price-tag-modal {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+  }
+  .price-tag-modal .old {
+    text-decoration: line-through;
+    color: #64748b;
+    font-size: 0.8rem;
+  }
+  .price-tag-modal .new {
+    color: white;
+    font-weight: 800;
+    font-size: 1.2rem;
+  }
+  .price-tag-modal small {
+    color: #94a3b8;
+    font-size: 0.7rem;
+  }
+
+  .btn-pay-now {
+    background: #fcd34d;
+    border: none;
+    padding: 12px 20px;
+    border-radius: 10px;
+    font-weight: 700;
+    color: #1e293b;
+    cursor: pointer;
+  }
+  .btn-close-text {
+    background: none;
+    border: none;
+    color: #94a3b8;
+    font-weight: 600;
+    cursor: pointer;
+    width: 100%;
+    padding: 10px;
+  }
+</style>

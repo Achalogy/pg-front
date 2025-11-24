@@ -1,54 +1,127 @@
 ---
-import { IconPigMoney } from "@tabler/icons-react";
-import SimpleProgressBar from "./SimpleProgressBar.astro";
-import customCashFormat from "../utils/customCashFormat";
+import { IconPigMoney, IconClock, IconCheck } from "@tabler/icons-react";
+import customCashFormat from "../utils/customCashFormat"; // Asumiendo que existe
 
 interface Props {
   id: string;
   name: string;
   targetAmount: number;
+  currentBalance: number;
   deadline: Date;
   completed: boolean;
   createdAt: Date;
-  currentBalance: number;
 }
 
-const goal: Props = Astro.props;
+const { id, name, targetAmount, currentBalance, deadline, completed } =
+  Astro.props;
+
+// --- Cálculos Visuales ---
+
+// 1. Porcentaje de progreso (Clamped 0-100)
+const rawPercentage = (currentBalance / targetAmount) * 100;
+const percentage = Math.min(Math.max(rawPercentage, 0), 100).toFixed(0);
+
+// 2. Días restantes (Lógica visual humana)
+const today = new Date();
+const deadlineDate = new Date(deadline);
+const diffTime = deadlineDate.getTime() - today.getTime();
+const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+
+let timeLabel = "";
+let timeColor = "text-neutral-400";
+
+if (completed) {
+  timeLabel = "¡Completada!";
+  timeColor = "text-emerald-500 font-bold";
+} else if (diffDays < 0) {
+  timeLabel = "Vencida";
+  timeColor = "text-red-400 font-bold";
+} else if (diffDays === 0) {
+  timeLabel = "Vence hoy";
+  timeColor = "text-orange-500 font-bold";
+} else {
+  timeLabel = `${diffDays} días restantes`;
+}
+
+// Formateadores
+const formattedCurrent = customCashFormat(currentBalance);
+const formattedTarget = customCashFormat(targetAmount);
 ---
 
-<div class="flex flex-col rounded-xl bg-white p-3 px-4 gap-1">
-  <div class="flex justify-between items-center">
-    <div
-      class="flex items-center justify-center w-1/5 max-w-10 h-10 rounded-full bg-indigo-200 text-white"
-    >
-      <IconPigMoney />
-    </div>
-    <div class="w-2/5 text-xs">
-      <a
-        class="text-xs text-black! no-underline!"
-        href={`/app/goal/${goal.id}`}
+<a
+  href={`/app/goal/${id}`}
+  class="group block bg-white rounded-2xl p-5 shadow-sm border border-neutral-100 transition-all hover:shadow-md active:scale-[0.99] no-underline! relative overflow-hidden"
+>
+  {/* Fondo decorativo sutil si está completada */}
+  {
+    completed && (
+      <div class="absolute inset-0 bg-emerald-50/30 pointer-events-none" />
+    )
+  }
+
+  {/* HEADER: Icono y Nombre */}
+  <div class="flex items-start justify-between mb-4 relative z-10">
+    <div class="flex items-center gap-3">
+      <div
+        class={`
+        w-10 h-10 rounded-full flex items-center justify-center transition-colors
+        ${completed ? "bg-emerald-100 text-emerald-600" : "bg-indigo-50 text-indigo-600 group-hover:bg-indigo-100"}
+      `}
       >
-        <b>{goal.name}</b>
-      </a>
+        {
+          completed ? (
+            <IconCheck size={20} stroke={3} />
+          ) : (
+            <IconPigMoney size={20} />
+          )
+        }
+      </div>
+      <div>
+        <h3 class="font-bold text-neutral-800 leading-tight">{name}</h3>
+        <div class="flex items-center gap-1 text-[11px] mt-0.5">
+          <IconClock size={12} className={timeColor.split(" ")[0]} />
+          <span class={timeColor}>{timeLabel}</span>
+        </div>
+      </div>
     </div>
-    <div class="w-2/5 flex flex-col gap-1 justify-end">
-      <p class="text-xs text-end text-neutral-500">
-        ${customCashFormat(goal.currentBalance)} /
-        <b>${customCashFormat(goal.targetAmount)}</b>
-      </p>
-      <SimpleProgressBar
-        done={goal.completed}
-        max={goal.targetAmount}
-        curr={goal.currentBalance}
-      />
+
+    {/* Badge de Porcentaje */}
+    <div class="text-right">
+      <span
+        class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-1 rounded-lg"
+      >
+        {percentage}%
+      </span>
     </div>
   </div>
-  <div class="flex justify-between">
-    <p class="text-xs text-neutral-300 w-3/5 line-clamp-2">
-      <!-- {transaction.description ?? ""} -->
-    </p>
-    <p class="text-xs text-neutral-300 text-end w-2/5">
-      {new Date(goal.deadline).toLocaleString("es-CO")}
-    </p>
+
+  {/* BODY: Cifras y Barra */}
+  <div class="relative z-10">
+    <div class="flex items-end justify-between mb-2">
+      <div class="flex flex-col">
+        <span class="text-xs text-neutral-400 font-medium">Ahorrado</span>
+        <span class="text-xl font-extrabold text-neutral-900 tracking-tight">
+          ${formattedCurrent}
+        </span>
+      </div>
+      <div class="flex flex-col items-end pb-0.5">
+        <span
+          class="text-[10px] text-neutral-400 uppercase font-bold tracking-wider"
+          >Meta</span
+        >
+        <span class="text-sm font-semibold text-neutral-500">
+          ${formattedTarget}
+        </span>
+      </div>
+    </div>
+
+    {/* Custom Progress Bar (Tailwind inline para mayor control) */}
+    <div class="h-2.5 w-full bg-neutral-100 rounded-full overflow-hidden">
+      <div
+        class={`h-full rounded-full transition-all duration-1000 ease-out ${completed ? "bg-emerald-500" : "bg-indigo-600"}`}
+        style={`width: ${percentage}%`}
+      >
+      </div>
+    </div>
   </div>
-</div>
+</a>
